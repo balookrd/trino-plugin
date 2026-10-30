@@ -23,6 +23,8 @@ jobs:
     # so the modules the plugins depend on are built from the release tag and cached
     name: Trino artifacts
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.key.outputs.value }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,12 +36,17 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
+      # Computed once, before the Trino sources are checked out into the workspace
+      - name: Compute cache key
+        id: key
+        run: echo "value=m2-trino-${TRINO_VERSION}-${{ hashFiles('pom.xml', 'trino-*/pom.xml') }}" >> "$GITHUB_OUTPUT"
+
       - name: Restore Maven repository
         id: cache
         uses: actions/cache/restore@v4
         with:
           path: ~/.m2/repository
-          key: m2-trino-${{ env.TRINO_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ steps.key.outputs.value }}
           restore-keys: m2-trino-${{ env.TRINO_VERSION }}-
 
       - name: Check Trino artifacts
@@ -75,7 +82,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.m2/repository
-          key: m2-trino-${{ env.TRINO_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ steps.key.outputs.value }}
 
   test:
     name: Test ${{ matrix.name }}
@@ -109,7 +116,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.m2/repository
-          key: m2-trino-${{ env.TRINO_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ needs.trino.outputs.cache-key }}
           fail-on-cache-miss: true
 
       - name: Build and test
