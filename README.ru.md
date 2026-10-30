@@ -150,3 +150,7 @@ mvn test
 ```bash
 mvn test -pl trino-greenplum -Dtesting.greenplum-image-name=woblerr/greenplum:7.1.0
 ```
+
+## Лицензия
+
+Apache License 2.0, см. [LICENSE](LICENSE). Часть кода коннекторов основана на коннекторах PostgreSQL и MySQL из Trino.

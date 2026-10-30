@@ -150,3 +150,7 @@ Testcontainers. Other images can be set with `-Dtesting.greenplum-image-name=...
 ```bash
 mvn test -pl trino-greenplum -Dtesting.greenplum-image-name=woblerr/greenplum:7.1.0
 ```
+
+## License
+
+Apache License 2.0, see [LICENSE](LICENSE). Parts of the connectors are based on the Trino PostgreSQL and MySQL connectors.
