@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Reuse Trino's build conventions and dependency versions. The project version must match
+         the Trino version, because trino-root manages io.trino artifacts as ${project.version}. -->
+    <parent>
+        <groupId>io.trino</groupId>
+        <artifactId>trino-root</artifactId>
+        <version>470</version>
+        <relativePath />
+    </parent>
+
+    <groupId>io.trino.contrib</groupId>
+    <artifactId>trino-extra-connectors</artifactId>
+    <version>470</version>
+    <packaging>pom</packaging>
+    <description>Trino - Greenplum and Apache Doris connectors</description>
+
+    <modules>
+        <module>trino-doris</module>
+        <module>trino-greenplum</module>
+    </modules>
+
+    <properties>
+        <air.check.skip-license>true</air.check.skip-license>
+        <!-- Allow building outside of a git checkout -->
+        <maven.gitcommitid.skip>true</maven.gitcommitid.skip>
+        <!-- Trino 470 test arguments include -Djava.security.manager=allow, which JDK 24+ rejects.
+             api.version: docker-java bundled with Testcontainers defaults to an API version older than Docker Engine 29 accepts.
+             jol.skipHotspotSAAttach: without it JOL may attach the Serviceability Agent to the test JVM itself, which suspends the JVM -->
+        <air.test.jvm.additional-arguments>-XX:G1HeapRegionSize=32M -XX:+UnlockDiagnosticVMOptions -XX:+EnableDynamicAgentLoading --add-modules=jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Dapi.version=1.44 -Djdk.attach.allowAttachSelf=true -Djol.skipHotspotSAAttach=true</air.test.jvm.additional-arguments>
+        <!-- Trino enforces a Temurin/Oracle JDK vendor, which is not required to build plugins -->
+        <air.check.skip-enforcer>true</air.check.skip-enforcer>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
