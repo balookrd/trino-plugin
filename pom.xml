@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.trino</groupId>
         <artifactId>trino-root</artifactId>
-        <version>470</version>
+        <version>477</version>
         <relativePath />
     </parent>
 
     <groupId>io.trino.contrib</groupId>
     <artifactId>trino-extra-connectors</artifactId>
-    <version>470</version>
+    <version>477</version>
     <packaging>pom</packaging>
     <description>Trino - Greenplum and Apache Doris connectors</description>
 
@@ -26,10 +26,9 @@
         <air.check.skip-license>true</air.check.skip-license>
         <!-- Allow building outside of a git checkout -->
         <maven.gitcommitid.skip>true</maven.gitcommitid.skip>
-        <!-- Trino 470 test arguments include -Djava.security.manager=allow, which JDK 24+ rejects.
-             api.version: docker-java bundled with Testcontainers defaults to an API version older than Docker Engine 29 accepts.
-             jol.skipHotspotSAAttach: without it JOL may attach the Serviceability Agent to the test JVM itself, which suspends the JVM -->
-        <air.test.jvm.additional-arguments>-XX:G1HeapRegionSize=32M -XX:+UnlockDiagnosticVMOptions -XX:+EnableDynamicAgentLoading --add-modules=jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Dapi.version=1.44 -Djdk.attach.allowAttachSelf=true -Djol.skipHotspotSAAttach=true</air.test.jvm.additional-arguments>
+        <!-- jol.skipHotspotSAAttach: without it JOL may attach the Serviceability Agent to the test JVM itself, which suspends the JVM.
+             api.version: docker-java bundled with Testcontainers 1.21 defaults to API 1.32, Docker Engine 29+ requires at least 1.40 -->
+        <air.test.jvm.additional-arguments>${air.test.jvm.additional-arguments.default} -Djol.skipHotspotSAAttach=true -Dapi.version=1.44</air.test.jvm.additional-arguments>
         <!-- Trino enforces a Temurin/Oracle JDK vendor, which is not required to build plugins -->
         <air.check.skip-enforcer>true</air.check.skip-enforcer>
     </properties>

@@ -1,6 +1,6 @@
 # Trino connectors for Greenplum and Apache Doris
 
-Two Trino connector plugins built against Trino 470:
+Two Trino connector plugins built against Trino 477:
 
 - `trino-greenplum` — Greenplum 6 and 7. Builds on the Trino PostgreSQL connector (type mapping, pushdown,
   statistics) and adds Greenplum-specific DDL and metadata.
@@ -9,18 +9,32 @@ Two Trino connector plugins built against Trino 470:
 
 ## Build
 
-Requirements: JDK 23 or newer, Maven 3.9, Docker (integration tests only).
+Requirements: JDK 24 or newer, Maven 3.9, Docker (integration tests only).
+
+Only `trino-root` and `trino-spi` of Trino 477 are published to Maven Central, so the Trino modules the plugins
+depend on have to be installed from the release sources first (once, they stay in `~/.m2`):
 
 ```bash
+git clone --depth 1 --branch 477 https://github.com/trinodb/trino.git trino-477
+(cd trino-477 && ./mvnw install -DskipTests -Dair.check.skip-all=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true \
+    -pl plugin/trino-postgresql,plugin/trino-geospatial,plugin/trino-base-jdbc,plugin/trino-tpch,testing/trino-testing,testing/trino-testing-services,core/trino-main \
+    -am)
 mvn clean package -DskipTests
 ```
 
-The plugin archives are in `trino-greenplum/target/trino-greenplum-470.zip` and
-`trino-doris/target/trino-doris-470.zip`. Unpack an archive into the `plugin` directory of a Trino 470 server
+The plugin archives are in `trino-greenplum/target/trino-greenplum-477.zip` and
+`trino-doris/target/trino-doris-477.zip`. Unpack an archive into the `plugin` directory of a Trino 477 server
 and restart it.
 
-The plugins depend on Trino SPI 470: the plugin version must match the server version. To target another
-Trino release, change the parent version and the project version in the root `pom.xml`.
+The plugins depend on Trino SPI 477: the plugin version must match the server version. To target another
+Trino release, change the parent version and the project version in the root `pom.xml`, and `TRINO_VERSION`
+in `.github/workflows/ci.yml`.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) builds the missing Trino modules once and caches them, then runs the
+tests against Greenplum 6, Greenplum 7 and Doris in parallel. The plugin archives are attached to every run.
+Pushing a tag `v*` creates a GitHub release with the archives.
 
 ## Greenplum
 

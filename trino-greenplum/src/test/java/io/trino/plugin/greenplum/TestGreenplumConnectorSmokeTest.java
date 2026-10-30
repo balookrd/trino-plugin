@@ -33,9 +33,9 @@ public class TestGreenplumConnectorSmokeTest
                 .build();
     }
 
-    // MERGE, and UPDATE implemented with it, works only for tables with a primary key, which Trino cannot create,
-    // and only with non_transactional_merge enabled; it is covered in TestGreenplumIntegration
-    private static final String MERGE_DISABLED = "Non-transactional MERGE is disabled";
+    // MERGE, and UPDATE implemented with it, works only for tables with a primary key, which Trino cannot create;
+    // it is covered in TestGreenplumIntegration
+    private static final String MERGE_DISABLED = "The connector can not perform merge on the target table without primary keys";
 
     @Test
     @Override

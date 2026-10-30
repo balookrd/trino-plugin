@@ -1,6 +1,6 @@
 # Коннекторы Trino для Greenplum и Apache Doris
 
-Два плагина-коннектора для Trino 470:
+Два плагина-коннектора для Trino 477:
 
 - `trino-greenplum` — Greenplum 6 и 7. Построен на PostgreSQL-коннекторе Trino (маппинг типов, pushdown,
   статистика) и добавляет DDL и метаданные, специфичные для Greenplum.
@@ -9,17 +9,31 @@
 
 ## Сборка
 
-Нужны JDK 23 или новее, Maven 3.9 и Docker (только для интеграционных тестов).
+Нужны JDK 24 или новее, Maven 3.9 и Docker (только для интеграционных тестов).
+
+Из Trino 477 в Maven Central опубликованы только `trino-root` и `trino-spi`, поэтому модули Trino, от которых
+зависят плагины, сначала ставятся из исходников релиза (один раз, дальше они лежат в `~/.m2`):
 
 ```bash
+git clone --depth 1 --branch 477 https://github.com/trinodb/trino.git trino-477
+(cd trino-477 && ./mvnw install -DskipTests -Dair.check.skip-all=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true \
+    -pl plugin/trino-postgresql,plugin/trino-geospatial,plugin/trino-base-jdbc,plugin/trino-tpch,testing/trino-testing,testing/trino-testing-services,core/trino-main \
+    -am)
 mvn clean package -DskipTests
 ```
 
-Архивы плагинов: `trino-greenplum/target/trino-greenplum-470.zip` и `trino-doris/target/trino-doris-470.zip`.
-Распакуйте архив в каталог `plugin` сервера Trino 470 и перезапустите сервер.
+Архивы плагинов: `trino-greenplum/target/trino-greenplum-477.zip` и `trino-doris/target/trino-doris-477.zip`.
+Распакуйте архив в каталог `plugin` сервера Trino 477 и перезапустите сервер.
 
-Плагины собраны против SPI Trino 470: версия плагина должна совпадать с версией сервера. Для другого релиза
-Trino поменяйте версию родителя и версию проекта в корневом `pom.xml`.
+Плагины собраны против SPI Trino 477: версия плагина должна совпадать с версией сервера. Для другого релиза
+Trino поменяйте версию родителя и версию проекта в корневом `pom.xml`, а также `TRINO_VERSION` в
+`.github/workflows/ci.yml`.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) один раз собирает недостающие модули Trino и кэширует их, затем
+параллельно гоняет тесты на Greenplum 6, Greenplum 7 и Doris. Архивы плагинов прикладываются к каждому прогону,
+а пуш тега `v*` создаёт GitHub Release с архивами.
 
 ## Greenplum
 

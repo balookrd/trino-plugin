@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.trino.contrib</groupId>
         <artifactId>trino-extra-connectors</artifactId>
-        <version>470</version>
+        <version>477</version>
     </parent>
 
     <artifactId>trino-doris</artifactId>
@@ -21,6 +21,7 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <classifier>classes</classifier>
         </dependency>
 
         <dependency>
@@ -63,6 +64,12 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api-incubator</artifactId>
             <scope>provided</scope>
         </dependency>
 
